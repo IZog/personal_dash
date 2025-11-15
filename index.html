@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Systems Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div id="app">
+    <header class="top-bar">
+      <div>
+        <h1>Momentum Dashboard</h1>
+        <p class="subtitle">Execute daily. Compound relentlessly.</p>
+      </div>
+      <button type="button" id="toggle-ceo" class="ghost-button" aria-pressed="false">CEO Mode</button>
+    </header>
+
+    <section class="dashboard" aria-label="Goal overview and quick momentum recap">
+      <div class="card goal-card" id="weight-progress">
+        <h2>Weight Progress</h2>
+        <div class="ring" data-type="weight">
+          <svg viewBox="0 0 120 120" role="img" aria-label="Weight goal progress">
+            <circle cx="60" cy="60" r="54" class="ring-bg"></circle>
+            <circle cx="60" cy="60" r="54" class="ring-progress" stroke-dasharray="339.292" stroke-dashoffset="339.292"></circle>
+            <text x="60" y="60" class="ring-value" text-anchor="middle" dy="8">0%</text>
+          </svg>
+        </div>
+        <div class="goal-meta">
+          <label for="weight-current">Current weight (kg)</label>
+          <input id="weight-current" type="number" step="0.1" min="0">
+          <button type="button" data-action="add-weight" class="primary-button">Log weight</button>
+        </div>
+      </div>
+
+      <div class="card goal-card" id="mrr-progress">
+        <h2>MRR Momentum</h2>
+        <div class="ring" data-type="mrr">
+          <svg viewBox="0 0 120 120" role="img" aria-label="MRR goal progress">
+            <circle cx="60" cy="60" r="54" class="ring-bg"></circle>
+            <circle cx="60" cy="60" r="54" class="ring-progress" stroke-dasharray="339.292" stroke-dashoffset="339.292"></circle>
+            <text x="60" y="60" class="ring-value" text-anchor="middle" dy="8">0%</text>
+          </svg>
+        </div>
+        <div class="goal-meta">
+          <label for="mrr-current">Current MRR (EUR)</label>
+          <input id="mrr-current" type="number" step="100">
+          <button type="button" data-action="update-mrr" class="primary-button">Update MRR</button>
+        </div>
+      </div>
+
+      <div class="card focus-card" id="todays-focus">
+        <h2>Today's Focus</h2>
+        <div class="focus-content">
+          <p><strong>Current block:</strong> <span data-field="current-block">Planning Power Hour</span></p>
+          <p><strong>Top habits to finish:</strong></p>
+          <ul data-field="pending-habits"></ul>
+          <div class="quick-actions">
+            <button type="button" data-action="start-power-hour" class="secondary-button">Start Power Hour</button>
+            <button type="button" data-action="log-deep-work" class="secondary-button">Log Deep Work</button>
+            <button type="button" data-action="quick-habit" class="secondary-button">Daily Habit Check-in</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card momentum-card" id="weekly-momentum">
+        <h2>Weekly Momentum</h2>
+        <div class="momentum-stats">
+          <div>
+            <span class="metric-label">Habit Completion</span>
+            <span data-field="habit-rate" class="metric-value">0%</span>
+          </div>
+          <div>
+            <span class="metric-label">Delegation Trend</span>
+            <span data-field="delegation-trend" class="metric-value">0%</span>
+          </div>
+          <div>
+            <span class="metric-label">Energy Avg</span>
+            <span data-field="energy-avg" class="metric-value">0/5</span>
+          </div>
+        </div>
+        <canvas id="momentum-chart" height="120"></canvas>
+      </div>
+    </section>
+
+    <section class="notifications" aria-live="polite" aria-atomic="true">
+      <ul id="notification-list"></ul>
+    </section>
+
+    <main>
+      <section class="system" id="system-extraction">
+        <header>
+          <h2>System 1 · Extraction to Delegation</h2>
+          <div class="quick-actions">
+            <button type="button" data-action="start-documentation">Start Documentation</button>
+            <button type="button" data-action="log-recording">Log Recording</button>
+          </div>
+        </header>
+        <div class="system-grid">
+          <article class="card">
+            <h3>Daily Documentation</h3>
+            <textarea id="documentation-entry" placeholder="Capture today's key processes..."></textarea>
+            <button type="button" data-action="save-documentation" class="primary-button">Save Entry</button>
+            <ul id="documentation-list" class="log-list"></ul>
+          </article>
+          <article class="card">
+            <h3>SOP Tracker</h3>
+            <div class="progress-container">
+              <div class="progress-bar"><span data-field="sop-progress" style="width:0%"></span></div>
+              <p><span data-field="sop-count">0</span> SOPs • Goal: 50</p>
+            </div>
+            <form id="sop-form" class="stack">
+              <input name="title" placeholder="SOP title" required>
+              <input name="status" placeholder="Status" value="Draft" required>
+              <textarea name="notes" placeholder="Key steps"></textarea>
+              <button type="submit">Add SOP</button>
+            </form>
+            <ul id="sop-list" class="log-list"></ul>
+          </article>
+          <article class="card">
+            <h3>Recording Log</h3>
+            <form id="recording-form" class="stack">
+              <input name="title" placeholder="Process title" required>
+              <input name="link" placeholder="Recording link">
+              <label class="inline">Checklist completed <input type="checkbox" name="checked"></label>
+              <button type="submit">Log Recording</button>
+            </form>
+            <p>Total training videos: <strong data-field="recording-count">0</strong></p>
+            <ul id="recording-list" class="log-list"></ul>
+          </article>
+          <article class="card">
+            <h3>Delegation Tracker</h3>
+            <div class="delegation-stats">
+              <label for="delegation-input">Current delivery time %</label>
+              <input id="delegation-input" type="number" min="0" max="100" step="1">
+              <button type="button" data-action="save-delegation">Update</button>
+              <p>Target: 30% • Current: <strong data-field="delegation-current">0%</strong></p>
+            </div>
+            <canvas id="delegation-chart" height="140"></canvas>
+          </article>
+        </div>
+      </section>
+
+      <section class="system" id="system-body">
+        <header>
+          <h2>System 2 · Body Recomposition</h2>
+          <div class="quick-actions">
+            <button type="button" data-action="toggle-fast">Start Fast</button>
+            <button type="button" data-action="log-meal">Log Meal Photo</button>
+            <button type="button" data-action="log-workout">Today's Workout</button>
+          </div>
+        </header>
+        <div class="system-grid">
+          <article class="card">
+            <h3>Weight Tracker</h3>
+            <div class="stack">
+              <input id="weight-input" type="number" placeholder="Weight (kg)" step="0.1">
+              <button type="button" data-action="add-weight" class="primary-button">Add Weight</button>
+              <p>Weekly avg: <strong data-field="weekly-weight">0</strong> kg</p>
+            </div>
+            <canvas id="weight-chart" height="140"></canvas>
+          </article>
+          <article class="card">
+            <h3>Fasting Timer (16:8)</h3>
+            <div class="timer" data-type="fasting">
+              <p class="timer-label" data-field="fasting-status">Not started</p>
+              <p class="timer-value" data-field="fasting-remaining">16:00:00</p>
+              <div class="timer-controls">
+                <button type="button" data-action="toggle-fast" class="primary-button">Start Fast</button>
+                <button type="button" data-action="break-fast" class="secondary-button">Break Fast</button>
+              </div>
+              <p>Streak: <strong data-field="fasting-streak">0</strong> days</p>
+            </div>
+          </article>
+          <article class="card">
+            <h3>Meal Photo Log</h3>
+            <input type="file" id="meal-photo" accept="image/*" capture="environment">
+            <button type="button" data-action="log-meal" class="secondary-button">Add Photo</button>
+            <div class="calendar-grid" id="meal-calendar"></div>
+          </article>
+          <article class="card">
+            <h3>Workout Checker</h3>
+            <label class="inline">Workout complete today? <input type="checkbox" id="workout-today"></label>
+            <textarea id="workout-notes" placeholder="Progressive overload notes"></textarea>
+            <button type="button" data-action="log-workout">Save Workout</button>
+            <div id="workout-week" class="calendar-grid"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="system" id="system-revenue">
+        <header>
+          <h2>System 3 · Revenue Multiplication</h2>
+          <div class="quick-actions">
+            <button type="button" data-action="log-client-win">Log Client Win</button>
+            <button type="button" data-action="add-workshop">Add Workshop Idea</button>
+            <button type="button" data-action="log-training">Team Training Complete</button>
+          </div>
+        </header>
+        <div class="system-grid">
+          <article class="card">
+            <h3>Template Library</h3>
+            <form id="template-form" class="stack">
+              <input name="title" placeholder="Template name" required>
+              <input name="category" placeholder="Category/tag">
+              <textarea name="content" placeholder="Notes"></textarea>
+              <button type="submit">Save Template</button>
+            </form>
+            <p>Total templates: <strong data-field="template-count">0</strong></p>
+            <ul id="template-list" class="log-list"></ul>
+          </article>
+          <article class="card">
+            <h3>Workshop Pipeline</h3>
+            <form id="workshop-form" class="stack">
+              <input name="title" placeholder="Workshop idea" required>
+              <select name="status">
+                <option value="Idea">Idea</option>
+                <option value="Drafting">Drafting</option>
+                <option value="Scheduled">Scheduled</option>
+                <option value="Delivered">Delivered</option>
+              </select>
+              <input name="target" type="number" placeholder="Revenue goal EUR" step="100">
+              <button type="submit">Add Workshop</button>
+            </form>
+            <ul id="workshop-list" class="log-list"></ul>
+          </article>
+          <article class="card">
+            <h3>Team Training Log</h3>
+            <form id="training-form" class="stack">
+              <input name="topic" placeholder="Topic covered" required>
+              <input name="members" placeholder="Team members">
+              <label class="inline">Friday session complete? <input type="checkbox" name="friday"></label>
+              <button type="submit">Log Session</button>
+            </form>
+            <ul id="training-list" class="log-list"></ul>
+          </article>
+          <article class="card">
+            <h3>Client Wins</h3>
+            <form id="client-win-form" class="stack">
+              <input name="client" placeholder="Client name" required>
+              <textarea name="result" placeholder="Result"></textarea>
+              <button type="submit">Log Win</button>
+            </form>
+            <p>Case studies ready: <strong data-field="case-count">0</strong></p>
+            <ul id="client-win-list" class="log-list"></ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="system" id="system-energy">
+        <header>
+          <h2>System 4 · Energy Management</h2>
+          <div class="quick-actions">
+            <button type="button" data-action="start-power-hour">Start Power Hour</button>
+            <button type="button" data-action="rate-meeting">Rate Meeting</button>
+            <button type="button" data-action="log-deep-work">Log Deep Work</button>
+          </div>
+        </header>
+        <div class="system-grid">
+          <article class="card">
+            <h3>Meeting Tracker</h3>
+            <form id="meeting-form" class="stack">
+              <input name="title" placeholder="Meeting" required>
+              <input name="time" type="time" required>
+              <label>Energy drain (1-5) <input type="number" name="energy" min="1" max="5" required></label>
+              <button type="submit">Log Meeting</button>
+            </form>
+            <p>Today's meetings: <strong data-field="meeting-count">0</strong></p>
+            <ul id="meeting-list" class="log-list"></ul>
+          </article>
+          <article class="card">
+            <h3>Power Hour Defender</h3>
+            <div class="timer" data-type="power">
+              <p class="timer-label" data-field="power-status">Ready</p>
+              <p class="timer-value" data-field="power-remaining">01:00:00</p>
+              <div class="timer-controls">
+                <button type="button" data-action="start-power-hour" class="primary-button">Start</button>
+                <button type="button" data-action="stop-power-hour" class="secondary-button">Stop</button>
+              </div>
+              <label for="power-notes">What was accomplished?</label>
+              <textarea id="power-notes" placeholder="Focus wins..."></textarea>
+              <button type="button" data-action="save-power-hour">Save Session</button>
+              <p>Monthly protection rate: <strong data-field="power-rate">0%</strong></p>
+            </div>
+          </article>
+          <article class="card">
+            <h3>Focus Time Analyzer</h3>
+            <form id="focus-form" class="stack">
+              <input name="block" placeholder="Deep work focus" required>
+              <input name="start" type="time" required>
+              <input name="duration" type="number" placeholder="Minutes" required>
+              <input name="interruptions" type="number" placeholder="Interruptions" value="0">
+              <button type="submit">Log Focus Block</button>
+            </form>
+            <ul id="focus-list" class="log-list"></ul>
+            <p>Most productive time: <strong data-field="productive-time">--</strong></p>
+          </article>
+        </div>
+      </section>
+
+      <section class="system" id="system-habits">
+        <header>
+          <h2>System 5 · Daily Compound Habits</h2>
+          <div class="quick-actions">
+            <button type="button" data-action="quick-habit">Daily Habit Checkboxes</button>
+            <button type="button" data-action="sunday-setup">Sunday Setup</button>
+          </div>
+        </header>
+        <div class="system-grid">
+          <article class="card">
+            <h3>Habit Checklist</h3>
+            <ul id="habit-list" class="habit-list"></ul>
+            <p>Weekly completion: <strong data-field="habit-weekly">0%</strong></p>
+            <p>Monthly completion: <strong data-field="habit-monthly">0%</strong></p>
+            <div id="habit-streaks"></div>
+          </article>
+          <article class="card">
+            <h3>Cumulative Impact</h3>
+            <ul>
+              <li>Total training videos: <strong data-field="impact-videos">0</strong></li>
+              <li>Total sales touchpoints: <strong data-field="impact-sales">0</strong></li>
+              <li>Case studies documented: <strong data-field="impact-cases">0</strong></li>
+            </ul>
+            <canvas id="compound-chart" height="140"></canvas>
+          </article>
+          <article class="card">
+            <h3>Sunday Setup Ritual</h3>
+            <textarea id="sunday-plan" placeholder="Plan the week ahead..."></textarea>
+            <button type="button" data-action="save-sunday">Save Plan</button>
+            <p>Next session: Sunday 7:00 PM</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="system" id="system-unique">
+        <header>
+          <h2>Strategic Assistants</h2>
+        </header>
+        <div class="system-grid">
+          <article class="card">
+            <h3>Delegation Assistant</h3>
+            <p data-field="delegation-assistant">Add daily admin tasks to delegation queue.</p>
+          </article>
+          <article class="card">
+            <h3>Energy Optimizer</h3>
+            <p data-field="energy-optimizer">Log meetings to see peak focus windows.</p>
+          </article>
+          <article class="card">
+            <h3>Compound Effect Visualizer</h3>
+            <p>Projected impact based on current pace:</p>
+            <ul>
+              <li>6 months: <strong data-field="compound-6">0</strong></li>
+              <li>12 months: <strong data-field="compound-12">0</strong></li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Quick Win</h3>
+            <p data-field="quick-win">Log a new SOP to move closer to 30% delivery.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <template id="log-item-template">
+    <li>
+      <div class="log-title"></div>
+      <div class="log-meta"></div>
+    </li>
+  </template>
+
+  <template id="habit-item-template">
+    <li>
+      <label>
+        <input type="checkbox">
+        <span class="habit-label"></span>
+      </label>
+      <span class="habit-streak"></span>
+    </li>
+  </template>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>

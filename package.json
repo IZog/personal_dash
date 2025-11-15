@@ -1,0 +1,11 @@
+{
+  "name": "personal-systems-dashboard",
+  "version": "1.0.0",
+  "description": "Daily systems tracker dashboard for weight, revenue, delegation, energy and habit compounding.",
+  "private": true,
+  "scripts": {
+    "dev": "python3 -m http.server 5173",
+    "start": "python3 -m http.server 5173",
+    "test": "echo 'No automated tests yet'"
+  }
+}
