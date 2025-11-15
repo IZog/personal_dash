@@ -21,12 +21,12 @@ This project is a single-page progressive dashboard that keeps five interconnect
    git clone <repo-url>
    cd personal_dash
    ```
-2. Serve the site locally so that timers, notifications and camera uploads behave as they do in production. Any static server works; a simple option is Python's built-in server:
+2. Serve the site locally so that timers, notifications and camera uploads behave as they do in production. A helper `package.json` is included so you can simply run:
    ```bash
-   python3 -m http.server 5173
+   npm run dev
    ```
-   Then visit [http://localhost:5173](http://localhost:5173) in a modern browser (Chrome, Edge, Safari or Firefox).
-   > If you prefer, you can also open `index.html` directly in the browser, but some features (notifications, media permissions) may require an `http://` context.
+   This command uses Python's built-in HTTP server underneath, so there is nothing to install beyond a working Python 3 runtime. Then visit [http://localhost:5173](http://localhost:5173) in a modern browser (Chrome, Edge, Safari or Firefox).
+   > Prefer not to use npm? Run `python3 -m http.server 5173` yourself or open `index.html` directly in the browser. Just keep in mind that notifications, timers and media permissions behave more consistently when served via `http://`.
 3. The interface is responsive. On mobile, add it to your home screen for an app-like feel.
 4. Interact with the dashboard:
    - Log weights, MRR updates and daily habits to see goal rings animate.
