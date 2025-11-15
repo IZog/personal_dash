@@ -33,6 +33,34 @@ This project is a single-page progressive dashboard that keeps five interconnect
    - Start/stop timers (fasting, power hour) and watch streaks update automatically.
    - Add SOPs, recordings, templates, meetings and more to feed the compound metrics and insights.
 
+## Deployment
+
+Because the project is a static site (HTML/CSS/JS only) you can host it on any static hosting provider. Below are three common
+options:
+
+### GitHub Pages (free, no extra tools)
+
+1. Create a new GitHub repository and push this code to `main`.
+2. In the repository settings, open **Pages** and set the source to `GitHub Actions` or the `main` branch with `/ (root)` folder.
+3. Pages will build automatically and give you a URL like `https://<username>.github.io/<repo>/`.
+4. Whenever you push new commits to `main`, the site redeploys automatically.
+
+### Netlify (drag-and-drop or Git-connected)
+
+1. Create a Netlify account (free tier works).
+2. Choose **Add new site → Import an existing project** and connect your Git provider, or drag the project folder into the Netlify dashboard.
+3. Use the default build command (none needed) and set the publish directory to the repo root.
+4. Netlify will deploy in seconds and give you a customisable `.netlify.app` domain with HTTPS and preview deploys.
+
+### Vercel (great for previews)
+
+1. Install the Vercel CLI or use the dashboard to import the Git repository.
+2. When asked for framework, choose **Other** (static) so no build step is executed.
+3. Accept the defaults—Vercel will serve the root directory and assign a `.vercel.app` URL.
+4. Each push to the tracked branch triggers automatic preview and production deployments.
+
+> Tip: because the app relies on browser `localStorage`, no additional backend configuration is required on any host.
+
 ## Data model
 
 The application initialises with sensible defaults and stores everything as a JSON payload under the key `personal-systems-tracker-v1`. If you ever want to reset progress, clear the key from browser dev tools or run `localStorage.clear()` in the console.
